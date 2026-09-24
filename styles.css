@@ -302,6 +302,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn--sm { min-height: 34px; padding: var(--sp-1) var(--sp-3); font-size: var(--fs-sm); }
 .btn--block { width: 100%; }
 
+/* Language switch — shows the code of the language you would switch to */
+.lang-btn {
+  min-height: 38px;
+  min-width: 42px;
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: .06em;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+}
+.lang-btn:hover { color: var(--c-brand); border-color: var(--c-brand); background: var(--c-brand-soft); }
+
 .icon-btn {
   display: inline-flex;
   align-items: center;

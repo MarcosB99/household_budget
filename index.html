@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Offline-first household finance manager. Track combined income, budgets, allocations and expenses month by month. All data stays in your browser.">
+  <meta name="description" content="Offline-first household finance manager / Gestor de finanzas del hogar sin conexión. Track combined income, budgets, allocations and expenses month by month. All data stays in your browser.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#0f766e">
-  <title>Household Finance</title>
+  <title>Finanzas del Hogar</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8F%A1%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<a class="skip-link" href="#main">Skip to main content</a>
+<a class="skip-link" href="#main" data-i18n="app.skip">Saltar al contenido principal</a>
 
 <!-- ======================= HEADER ======================= -->
 <header class="app-header">
@@ -21,49 +21,58 @@
     <div class="brand">
       <span class="brand__mark" aria-hidden="true">🏡</span>
       <span class="brand__text">
-        <strong>Household Finance</strong>
-        <small id="storageNote">Saved locally on this device</small>
+        <strong data-i18n="app.title">Finanzas del Hogar</strong>
+        <small id="storageNote" data-i18n="app.tagline">Guardado localmente en este dispositivo</small>
       </span>
     </div>
 
     <!-- Month navigation -->
-    <nav class="month-nav" aria-label="Month navigation">
-      <button type="button" class="icon-btn" id="btnPrevMonth" aria-label="Previous month" title="Previous month">
+    <nav class="month-nav" data-i18n-aria="nav.monthNav" aria-label="Navegación por mes">
+      <button type="button" class="icon-btn" id="btnPrevMonth"
+              data-i18n-aria="nav.prev" data-i18n-title="nav.prev"
+              aria-label="Mes anterior" title="Mes anterior">
         <span aria-hidden="true">‹</span>
       </button>
 
       <div class="month-nav__current">
-        <label class="sr-only" for="monthPicker">Select month</label>
+        <label class="sr-only" for="monthPicker" data-i18n="nav.selectMonth">Seleccionar mes</label>
         <input type="month" id="monthPicker" class="month-nav__input">
         <span class="month-nav__label" id="monthLabel" aria-live="polite">—</span>
       </div>
 
-      <button type="button" class="icon-btn" id="btnNextMonth" aria-label="Next month" title="Next month">
+      <button type="button" class="icon-btn" id="btnNextMonth"
+              data-i18n-aria="nav.next" data-i18n-title="nav.next"
+              aria-label="Mes siguiente" title="Mes siguiente">
         <span aria-hidden="true">›</span>
       </button>
 
-      <button type="button" class="btn btn--ghost btn--sm" id="btnThisMonth">Today</button>
+      <button type="button" class="btn btn--ghost btn--sm" id="btnThisMonth" data-i18n="nav.today">Hoy</button>
     </nav>
 
     <div class="app-header__actions">
-      <button type="button" class="icon-btn" id="btnTheme" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <!-- Language switch: shows the language you would switch TO -->
+      <button type="button" class="btn btn--ghost btn--sm lang-btn" id="btnLang">
+        <span aria-hidden="true" id="langCode">EN</span>
+      </button>
+
+      <button type="button" class="icon-btn" id="btnTheme">
         <span aria-hidden="true" id="themeIcon">🌙</span>
       </button>
 
       <details class="menu" id="dataMenu">
         <summary class="btn btn--ghost btn--sm" aria-haspopup="menu">
-          <span aria-hidden="true">⋯</span><span class="menu__label">Data</span>
+          <span aria-hidden="true">⋯</span><span class="menu__label" data-i18n="menu.data">Datos</span>
         </summary>
         <div class="menu__panel" role="menu">
-          <button type="button" role="menuitem" data-action="export">⬇️ Export backup (JSON)</button>
-          <button type="button" role="menuitem" data-action="import">⬆️ Import backup…</button>
+          <button type="button" role="menuitem" data-action="export" data-i18n="menu.export">⬇️ Exportar respaldo (JSON)</button>
+          <button type="button" role="menuitem" data-action="import" data-i18n="menu.import">⬆️ Importar respaldo…</button>
           <hr>
-          <button type="button" role="menuitem" data-action="copy-prev">📋 Copy plan from previous month</button>
-          <button type="button" role="menuitem" data-action="seed-defaults">✨ Add starter categories</button>
+          <button type="button" role="menuitem" data-action="copy-prev" data-i18n="menu.copyPrev">📋 Copiar plan del mes anterior</button>
+          <button type="button" role="menuitem" data-action="seed-defaults" data-i18n="menu.seedDefaults">✨ Agregar categorías iniciales</button>
           <hr>
-          <button type="button" role="menuitem" data-action="settings">⚙️ Settings</button>
-          <button type="button" role="menuitem" class="danger" data-action="clear-month">🧹 Clear this month</button>
-          <button type="button" role="menuitem" class="danger" data-action="reset-all">🗑️ Delete all data</button>
+          <button type="button" role="menuitem" data-action="settings" data-i18n="menu.settings">⚙️ Configuración</button>
+          <button type="button" role="menuitem" class="danger" data-action="clear-month" data-i18n="menu.clearMonth">🧹 Limpiar este mes</button>
+          <button type="button" role="menuitem" class="danger" data-action="reset-all" data-i18n="menu.resetAll">🗑️ Borrar todos los datos</button>
         </div>
       </details>
     </div>
@@ -72,18 +81,21 @@
 
   <!-- Tabs -->
   <div class="tabs-wrap">
-    <div class="tabs" role="tablist" aria-label="Sections">
-      <button type="button" role="tab" id="tab-dashboard"    aria-controls="view-dashboard"    aria-selected="true"  data-view="dashboard">Dashboard</button>
-      <button type="button" role="tab" id="tab-income"       aria-controls="view-income"       aria-selected="false" data-view="income" tabindex="-1">Income</button>
-      <button type="button" role="tab" id="tab-budget"       aria-controls="view-budget"       aria-selected="false" data-view="budget" tabindex="-1">Budget</button>
-      <button type="button" role="tab" id="tab-allocations"  aria-controls="view-allocations"  aria-selected="false" data-view="allocations" tabindex="-1">Allocations</button>
-      <button type="button" role="tab" id="tab-transactions" aria-controls="view-transactions" aria-selected="false" data-view="transactions" tabindex="-1">Transactions</button>
+    <div class="tabs" role="tablist" data-i18n-aria="nav.sections" aria-label="Secciones">
+      <button type="button" role="tab" id="tab-dashboard"    aria-controls="view-dashboard"    aria-selected="true"  data-view="dashboard"    data-i18n="tab.dashboard">Resumen</button>
+      <button type="button" role="tab" id="tab-income"       aria-controls="view-income"       aria-selected="false" data-view="income"       data-i18n="tab.income" tabindex="-1">Ingresos</button>
+      <button type="button" role="tab" id="tab-budget"       aria-controls="view-budget"       aria-selected="false" data-view="budget"       data-i18n="tab.budget" tabindex="-1">Presupuesto</button>
+      <button type="button" role="tab" id="tab-allocations"  aria-controls="view-allocations"  aria-selected="false" data-view="allocations"  data-i18n="tab.allocations" tabindex="-1">Asignaciones</button>
+      <button type="button" role="tab" id="tab-transactions" aria-controls="view-transactions" aria-selected="false" data-view="transactions" data-i18n="tab.transactions" tabindex="-1">Transacciones</button>
     </div>
   </div>
 </header>
 
 <noscript>
-  <p class="noscript">This application needs JavaScript enabled to run.</p>
+  <p class="noscript">
+    Esta aplicación necesita JavaScript para funcionar.<br>
+    This application needs JavaScript enabled to run.
+  </p>
 </noscript>
 
 <!-- ======================= MAIN ======================= -->
@@ -97,31 +109,31 @@
     <div class="panel-grid">
       <section class="card" aria-labelledby="h-plan-actual">
         <header class="card__head">
-          <h2 id="h-plan-actual">Planned vs. actual</h2>
+          <h2 id="h-plan-actual" data-i18n="dash.planActual">Planificado vs. real</h2>
         </header>
         <div class="card__body" id="planActual"><!-- rendered --></div>
       </section>
 
       <section class="card" aria-labelledby="h-cat-health">
         <header class="card__head">
-          <h2 id="h-cat-health">Category health</h2>
-          <button type="button" class="btn btn--ghost btn--sm" data-goto="budget">Manage</button>
+          <h2 id="h-cat-health" data-i18n="dash.categoryHealth">Estado de categorías</h2>
+          <button type="button" class="btn btn--ghost btn--sm" data-goto="budget" data-i18n="action.manage">Gestionar</button>
         </header>
         <div class="card__body" id="categoryHealth"><!-- rendered --></div>
       </section>
 
       <section class="card" aria-labelledby="h-alloc-progress">
         <header class="card__head">
-          <h2 id="h-alloc-progress">Allocation progress</h2>
-          <button type="button" class="btn btn--ghost btn--sm" data-goto="allocations">Manage</button>
+          <h2 id="h-alloc-progress" data-i18n="dash.allocProgress">Progreso de asignaciones</h2>
+          <button type="button" class="btn btn--ghost btn--sm" data-goto="allocations" data-i18n="action.manage">Gestionar</button>
         </header>
         <div class="card__body" id="allocationProgress"><!-- rendered --></div>
       </section>
 
       <section class="card" aria-labelledby="h-recent">
         <header class="card__head">
-          <h2 id="h-recent">Recent activity</h2>
-          <button type="button" class="btn btn--ghost btn--sm" data-goto="transactions">View all</button>
+          <h2 id="h-recent" data-i18n="dash.recent">Actividad reciente</h2>
+          <button type="button" class="btn btn--ghost btn--sm" data-goto="transactions" data-i18n="action.viewAll">Ver todo</button>
         </header>
         <div class="card__body" id="recentActivity"><!-- rendered --></div>
       </section>
@@ -133,10 +145,10 @@
     <section class="card">
       <header class="card__head">
         <div>
-          <h2>Income sources</h2>
-          <p class="card__sub">Combined household income for <span class="js-month-name">this month</span>.</p>
+          <h2 data-i18n="income.title">Fuentes de ingreso</h2>
+          <p class="card__sub" id="incomeSub"><!-- rendered: includes the month name --></p>
         </div>
-        <button type="button" class="btn btn--primary btn--sm" data-add="income">+ Add income</button>
+        <button type="button" class="btn btn--primary btn--sm" data-add="income" data-i18n="income.addBtn">+ Agregar ingreso</button>
       </header>
       <div class="card__body" id="incomeList"><!-- rendered --></div>
       <footer class="card__foot" id="incomeFoot"><!-- rendered --></footer>
@@ -148,10 +160,10 @@
     <section class="card">
       <header class="card__head">
         <div>
-          <h2>Budget categories</h2>
-          <p class="card__sub">Actual spending is calculated from your logged expense transactions.</p>
+          <h2 data-i18n="budget.title">Categorías de presupuesto</h2>
+          <p class="card__sub" data-i18n="budget.sub">El gasto real se calcula a partir de las transacciones de gasto registradas.</p>
         </div>
-        <button type="button" class="btn btn--primary btn--sm" data-add="category">+ Add category</button>
+        <button type="button" class="btn btn--primary btn--sm" data-add="category" data-i18n="budget.addBtn">+ Agregar categoría</button>
       </header>
       <div class="card__body" id="categoryList"><!-- rendered --></div>
       <footer class="card__foot" id="categoryFoot"><!-- rendered --></footer>
@@ -163,10 +175,10 @@
     <section class="card">
       <header class="card__head">
         <div>
-          <h2>Allocations</h2>
-          <p class="card__sub">Savings, emergency fund, debt payments and investments.</p>
+          <h2 data-i18n="alloc.title">Asignaciones</h2>
+          <p class="card__sub" data-i18n="alloc.sub">Ahorros, fondo de emergencia, pago de deudas e inversiones.</p>
         </div>
-        <button type="button" class="btn btn--primary btn--sm" data-add="allocation">+ Add allocation</button>
+        <button type="button" class="btn btn--primary btn--sm" data-add="allocation" data-i18n="alloc.addBtn">+ Agregar asignación</button>
       </header>
       <div class="card__body" id="allocationList"><!-- rendered --></div>
       <footer class="card__foot" id="allocationFoot"><!-- rendered --></footer>
@@ -178,31 +190,32 @@
     <section class="card">
       <header class="card__head">
         <div>
-          <h2>Transactions</h2>
+          <h2 data-i18n="tx.title">Transacciones</h2>
           <p class="card__sub" id="txCount">—</p>
         </div>
-        <button type="button" class="btn btn--primary btn--sm" data-add="transaction">+ Add transaction</button>
+        <button type="button" class="btn btn--primary btn--sm" data-add="transaction" data-i18n="tx.addBtn">+ Agregar transacción</button>
       </header>
 
       <div class="filters" role="search">
         <div class="field field--inline">
-          <label class="sr-only" for="txSearch">Search transactions</label>
-          <input type="search" id="txSearch" placeholder="Search description…" autocomplete="off">
+          <label class="sr-only" for="txSearch" data-i18n="tx.searchLabel">Buscar transacciones</label>
+          <input type="search" id="txSearch" autocomplete="off"
+                 data-i18n-placeholder="tx.searchPlaceholder" placeholder="Buscar descripción…">
         </div>
         <div class="field field--inline">
-          <label class="sr-only" for="txType">Filter by type</label>
+          <label class="sr-only" for="txType" data-i18n="tx.filterTypeLabel">Filtrar por tipo</label>
           <select id="txType">
-            <option value="all">All types</option>
-            <option value="expense">Expenses</option>
-            <option value="income">Income</option>
-            <option value="allocation">Allocations</option>
+            <option value="all"        data-i18n="tx.allTypes">Todos los tipos</option>
+            <option value="expense"    data-i18n="tx.typeExpensePlural">Gastos</option>
+            <option value="income"     data-i18n="tx.typeIncomePlural">Ingresos</option>
+            <option value="allocation" data-i18n="tx.typeAllocationPlural">Asignaciones</option>
           </select>
         </div>
         <div class="field field--inline">
-          <label class="sr-only" for="txRef">Filter by category</label>
-          <select id="txRef"><option value="all">All categories</option></select>
+          <label class="sr-only" for="txRef" data-i18n="tx.filterCatLabel">Filtrar por categoría</label>
+          <select id="txRef"><!-- rendered --></select>
         </div>
-        <button type="button" class="btn btn--ghost btn--sm" id="btnClearFilters">Reset</button>
+        <button type="button" class="btn btn--ghost btn--sm" id="btnClearFilters" data-i18n="action.reset">Restablecer</button>
       </div>
 
       <div class="card__body" id="transactionList"><!-- rendered --></div>
@@ -213,7 +226,9 @@
 </main>
 
 <!-- Floating add button (mobile-first quick entry) -->
-<button type="button" class="fab" id="fab" data-add="transaction" aria-label="Add transaction" title="Add transaction">
+<button type="button" class="fab" id="fab" data-add="transaction"
+        data-i18n-aria="action.addTransaction" data-i18n-title="action.addTransaction"
+        aria-label="Agregar transacción" title="Agregar transacción">
   <span aria-hidden="true">+</span>
 </button>
 
@@ -222,8 +237,9 @@
   <div class="modal__backdrop" data-close="true"></div>
   <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="modalPanel">
     <header class="modal__head">
-      <h2 id="modalTitle">Dialog</h2>
-      <button type="button" class="icon-btn" data-close="true" aria-label="Close dialog">
+      <h2 id="modalTitle">—</h2>
+      <button type="button" class="icon-btn" data-close="true"
+              data-i18n-aria="modal.close" aria-label="Cerrar diálogo">
         <span aria-hidden="true">✕</span>
       </button>
     </header>
