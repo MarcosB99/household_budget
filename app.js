@@ -71,13 +71,13 @@
       'tab.transactions': 'Transactions',
 
       'menu.data': 'Data',
-      'menu.export': '⬇️ Export backup (JSON)',
-      'menu.import': '⬆️ Import backup…',
-      'menu.copyPrev': '📋 Copy plan from previous month',
-      'menu.seedDefaults': '✨ Add starter categories',
-      'menu.settings': '⚙️ Settings',
-      'menu.clearMonth': '🧹 Clear this month',
-      'menu.resetAll': '🗑️ Delete all data',
+      'menu.export': 'Export backup (JSON)',
+      'menu.import': 'Import backup…',
+      'menu.copyPrev': 'Copy plan from previous month',
+      'menu.seedDefaults': 'Add starter categories',
+      'menu.settings': 'Settings',
+      'menu.clearMonth': 'Clear this month',
+      'menu.resetAll': 'Delete all data',
 
       'modal.close': 'Close dialog',
 
@@ -397,13 +397,13 @@
       'tab.transactions': 'Transacciones',
 
       'menu.data': 'Datos',
-      'menu.export': '⬇️ Exportar respaldo (JSON)',
-      'menu.import': '⬆️ Importar respaldo…',
-      'menu.copyPrev': '📋 Copiar plan del mes anterior',
-      'menu.seedDefaults': '✨ Agregar categorías iniciales',
-      'menu.settings': '⚙️ Configuración',
-      'menu.clearMonth': '🧹 Limpiar este mes',
-      'menu.resetAll': '🗑️ Borrar todos los datos',
+      'menu.export': 'Exportar respaldo (JSON)',
+      'menu.import': 'Importar respaldo…',
+      'menu.copyPrev': 'Copiar plan del mes anterior',
+      'menu.seedDefaults': 'Agregar categorías iniciales',
+      'menu.settings': 'Configuración',
+      'menu.clearMonth': 'Limpiar este mes',
+      'menu.resetAll': 'Borrar todos los datos',
 
       'modal.close': 'Cerrar diálogo',
 
@@ -769,7 +769,7 @@
    * 2. UTILS
    * =========================================================== */
   const Utils = (() => {
-    const $  = (sel, root = document) => root.querySelector(sel);
+    const $ = (sel, root = document) => root.querySelector(sel);
     const $$ = (sel, root = document) => Array.prototype.slice.call(root.querySelectorAll(sel));
 
     /** Unique id, with a fallback for browsers without crypto.randomUUID. */
@@ -777,7 +777,7 @@
       const rand = (typeof crypto !== 'undefined' && crypto.randomUUID)
         ? crypto.randomUUID()
         : 'xxxxxxxx-xxxx-4xxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16))
-          + '-' + Date.now().toString(36);
+        + '-' + Date.now().toString(36);
       return (prefix || 'id') + '_' + rand;
     }
 
@@ -1351,9 +1351,9 @@
       const allocActual = sum(allocs, (r) => r.actual);
 
       return {
-        income:      { planned: incomePlanned,  actual: incomeActual },
-        expenses:    { planned: expensePlanned, actual: expenseActual },
-        allocations: { planned: allocPlanned,   actual: allocActual },
+        income: { planned: incomePlanned, actual: incomeActual },
+        expenses: { planned: expensePlanned, actual: expenseActual },
+        allocations: { planned: allocPlanned, actual: allocActual },
         remaining: {
           planned: round2(incomePlanned - expensePlanned - allocPlanned),
           actual: round2(incomeActual - expenseActual - allocActual)
@@ -1480,7 +1480,7 @@
       document.body.style.overflow = 'hidden';
 
       const first = panel.querySelector('input:not([type=hidden]),select,textarea') ||
-                    panel.querySelector(FOCUSABLE);
+        panel.querySelector(FOCUSABLE);
       if (first) setTimeout(() => first.focus(), 30);
     }
 
@@ -1819,7 +1819,7 @@
     function rowActions(kind, id) {
       return '<div class="row__actions">' +
         '<button type="button" class="btn btn--ghost btn--sm" data-edit="' + kind + '" data-id="' + esc(id) + '">' +
-          esc(t('action.edit')) + '</button>' +
+        esc(t('action.edit')) + '</button>' +
         '<button type="button" class="icon-btn icon-btn--danger" data-delete="' + kind + '" data-id="' + esc(id) + '" ' +
         'aria-label="' + esc(t('action.delete')) + '"><span aria-hidden="true">🗑</span></button>' +
         '</div>';
@@ -1858,16 +1858,16 @@
 
       $('#planActual').innerHTML = nothingAtAll
         ? emptyState('📊', t('empty.nothingPlanned.title'), t('empty.nothingPlanned.text', { month: label }),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="income">' +
-              esc(t('empty.nothingPlanned.addIncome')) + '</button>' +
-            '<button type="button" class="btn btn--sm" data-add="category">' +
-              esc(t('empty.nothingPlanned.addCategory')) + '</button>')
+          '<button type="button" class="btn btn--primary btn--sm" data-add="income">' +
+          esc(t('empty.nothingPlanned.addIncome')) + '</button>' +
+          '<button type="button" class="btn btn--sm" data-add="category">' +
+          esc(t('empty.nothingPlanned.addCategory')) + '</button>')
         : '<div class="compare">' +
-            compareRow(t('compare.income'), s.income.actual, s.income.planned, 'ok') +
-            compareRow(t('compare.expenses'), s.expenses.actual, s.expenses.planned,
-              Calc.statusFor(s.expenses.planned, s.expenses.actual)) +
-            compareRow(t('compare.allocations'), s.allocations.actual, s.allocations.planned, 'info') +
-          '</div>';
+        compareRow(t('compare.income'), s.income.actual, s.income.planned, 'ok') +
+        compareRow(t('compare.expenses'), s.expenses.actual, s.expenses.planned,
+          Calc.statusFor(s.expenses.planned, s.expenses.actual)) +
+        compareRow(t('compare.allocations'), s.allocations.actual, s.allocations.planned, 'info') +
+        '</div>';
 
       /* Category health */
       const cats = Calc.categoryRows(month)
@@ -1876,55 +1876,55 @@
 
       $('#categoryHealth').innerHTML = cats.length
         ? '<div class="compare">' + cats.map((c) =>
-            '<div class="compare__row">' +
-              '<div class="compare__top">' +
-                '<span class="compare__name">' + esc(c.name) + ' ' + statusPill(c.status, c.pct) + '</span>' +
-                '<span class="compare__nums num">' + Money.format(c.actual) + ' / ' + Money.format(c.planned) + '</span>' +
-              '</div>' +
-              progressBar(c.pct, c.status) +
-              '<p class="row__sub ' + (c.balance < 0 ? 'neg' : 'muted') + '">' +
-                esc(c.balance < 0
-                  ? t('cat.overBudget', { amount: Money.format(Math.abs(c.balance)) })
-                  : t('cat.remaining', { amount: Money.format(c.balance) })) +
-              '</p>' +
-            '</div>').join('') + '</div>'
+          '<div class="compare__row">' +
+          '<div class="compare__top">' +
+          '<span class="compare__name">' + esc(c.name) + ' ' + statusPill(c.status, c.pct) + '</span>' +
+          '<span class="compare__nums num">' + Money.format(c.actual) + ' / ' + Money.format(c.planned) + '</span>' +
+          '</div>' +
+          progressBar(c.pct, c.status) +
+          '<p class="row__sub ' + (c.balance < 0 ? 'neg' : 'muted') + '">' +
+          esc(c.balance < 0
+            ? t('cat.overBudget', { amount: Money.format(Math.abs(c.balance)) })
+            : t('cat.remaining', { amount: Money.format(c.balance) })) +
+          '</p>' +
+          '</div>').join('') + '</div>'
         : emptyState('🎯', t('empty.noBudgets.title'), t('empty.noBudgets.text'),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="category">' +
-              esc(t('empty.nothingPlanned.addCategory')) + '</button>');
+          '<button type="button" class="btn btn--primary btn--sm" data-add="category">' +
+          esc(t('empty.nothingPlanned.addCategory')) + '</button>');
 
       /* Allocation progress */
       const allocs = Calc.allocationRows(month).filter((a) => a.planned > 0 || a.actual > 0);
       $('#allocationProgress').innerHTML = allocs.length
         ? '<div class="compare">' + allocs.map((a) =>
-            '<div class="compare__row">' +
-              '<div class="compare__top">' +
-                '<span class="compare__name">' + esc(a.name) + '</span>' +
-                '<span class="compare__nums num">' + Money.format(a.actual) + ' / ' + Money.format(a.planned) + '</span>' +
-              '</div>' +
-              progressBar(a.pct, a.pct >= 100 ? 'ok' : 'info') +
-            '</div>').join('') + '</div>'
+          '<div class="compare__row">' +
+          '<div class="compare__top">' +
+          '<span class="compare__name">' + esc(a.name) + '</span>' +
+          '<span class="compare__nums num">' + Money.format(a.actual) + ' / ' + Money.format(a.planned) + '</span>' +
+          '</div>' +
+          progressBar(a.pct, a.pct >= 100 ? 'ok' : 'info') +
+          '</div>').join('') + '</div>'
         : emptyState('🏦', t('empty.noAllocs.title'), t('empty.noAllocs.text'),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="allocation">' +
-              esc(t('empty.addAllocation')) + '</button>');
+          '<button type="button" class="btn btn--primary btn--sm" data-add="allocation">' +
+          esc(t('empty.addAllocation')) + '</button>');
 
       /* Recent activity */
       const recent = Calc.transactionRows(month).slice(0, 5);
       $('#recentActivity').innerHTML = recent.length
         ? '<div class="rows">' + recent.map((tx) =>
-            '<div class="row">' +
-              '<div class="row__main">' +
-                '<span class="row__title">' + esc(tx.description) + '</span>' +
-                '<span class="row__sub">' + esc(Utils.shortDate(tx.date)) + ' · ' +
-                  esc(tx.refName || t('cat.uncategorised')) + '</span>' +
-              '</div>' +
-              '<div class="row__amounts">' +
-                '<span class="row__amount num ' + (tx.type === 'income' ? 'pos' : '') + '">' +
-                  (tx.type === 'income' ? '+' : '−') + Money.format(tx.amount) + '</span>' +
-              '</div>' +
-            '</div>').join('') + '</div>'
+          '<div class="row">' +
+          '<div class="row__main">' +
+          '<span class="row__title">' + esc(tx.description) + '</span>' +
+          '<span class="row__sub">' + esc(Utils.shortDate(tx.date)) + ' · ' +
+          esc(tx.refName || t('cat.uncategorised')) + '</span>' +
+          '</div>' +
+          '<div class="row__amounts">' +
+          '<span class="row__amount num ' + (tx.type === 'income' ? 'pos' : '') + '">' +
+          (tx.type === 'income' ? '+' : '−') + Money.format(tx.amount) + '</span>' +
+          '</div>' +
+          '</div>').join('') + '</div>'
         : emptyState('🧾', t('empty.noTx.title'), t('empty.noTx.dashText', { month: label }),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="transaction">' +
-              esc(t('empty.addTransaction')) + '</button>');
+          '<button type="button" class="btn btn--primary btn--sm" data-add="transaction">' +
+          esc(t('empty.addTransaction')) + '</button>');
     }
 
     function tile(kind, label, value, metaA, metaB, tone) {
@@ -1939,10 +1939,10 @@
       const pct = Utils.percent(actual, planned);
       return '<div class="compare__row">' +
         '<div class="compare__top">' +
-          '<span class="compare__name">' + esc(name) + '</span>' +
-          '<span class="compare__nums num">' +
-            esc(t('compare.of', { actual: Money.format(actual), planned: Money.format(planned) })) +
-            ' <strong>(' + Math.round(pct) + '%)</strong></span>' +
+        '<span class="compare__name">' + esc(name) + '</span>' +
+        '<span class="compare__nums num">' +
+        esc(t('compare.of', { actual: Money.format(actual), planned: Money.format(planned) })) +
+        ' <strong>(' + Math.round(pct) + '%)</strong></span>' +
         '</div>' +
         progressBar(pct, tone) +
         '</div>';
@@ -1955,34 +1955,35 @@
 
       $('#incomeList').innerHTML = rows.length
         ? '<div class="rows">' + rows.map((r) =>
-            '<div class="row">' +
-              '<div class="row__main">' +
-                '<span class="row__title">' + esc(r.name) +
-                  (r.planned > 0
-                    ? '<span class="pill ' + (r.variance >= 0 ? 'pill--ok' : 'pill--warn') + '">' +
-                      esc(t('income.received', { pct: Math.round(r.pct) })) + '</span>'
-                    : '') +
-                '</span>' +
-                '<span class="row__sub">' +
-                  esc(t('income.plannedIs', { amount: Money.format(r.planned) })) +
-                  (r.logged > 0
-                    ? ' · ' + esc(t('income.breakdown', {
-                        recorded: Money.format(r.recorded), logged: Money.format(r.logged) }))
-                    : '') +
-                  (r.note ? ' · ' + esc(r.note) : '') +
-                '</span>' +
-              '</div>' +
-              '<div class="row__amounts">' +
-                '<span class="row__amount num">' + Money.format(r.actual) + '</span>' +
-                '<span class="row__sub num ' + (r.variance < 0 ? 'neg' : 'pos') + '">' +
-                  esc(t('income.vsPlan', { amount: Money.signed(r.variance) })) + '</span>' +
-              '</div>' +
-              rowActions('income', r.id) +
-            '</div>').join('') + '</div>'
+          '<div class="row">' +
+          '<div class="row__main">' +
+          '<span class="row__title">' + esc(r.name) +
+          (r.planned > 0
+            ? '<span class="pill ' + (r.variance >= 0 ? 'pill--ok' : 'pill--warn') + '">' +
+            esc(t('income.received', { pct: Math.round(r.pct) })) + '</span>'
+            : '') +
+          '</span>' +
+          '<span class="row__sub">' +
+          esc(t('income.plannedIs', { amount: Money.format(r.planned) })) +
+          (r.logged > 0
+            ? ' · ' + esc(t('income.breakdown', {
+              recorded: Money.format(r.recorded), logged: Money.format(r.logged)
+            }))
+            : '') +
+          (r.note ? ' · ' + esc(r.note) : '') +
+          '</span>' +
+          '</div>' +
+          '<div class="row__amounts">' +
+          '<span class="row__amount num">' + Money.format(r.actual) + '</span>' +
+          '<span class="row__sub num ' + (r.variance < 0 ? 'neg' : 'pos') + '">' +
+          esc(t('income.vsPlan', { amount: Money.signed(r.variance) })) + '</span>' +
+          '</div>' +
+          rowActions('income', r.id) +
+          '</div>').join('') + '</div>'
         : emptyState('💵', t('empty.noIncome.title'),
-            t('empty.noIncome.text', { month: Utils.monthLabel(monthKey) }),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="income">' +
-              esc(t('empty.noIncome.btn')) + '</button>' + copyPlanButton(monthKey));
+          t('empty.noIncome.text', { month: Utils.monthLabel(monthKey) }),
+          '<button type="button" class="btn btn--primary btn--sm" data-add="income">' +
+          esc(t('empty.noIncome.btn')) + '</button>' + copyPlanButton(monthKey));
 
       const s = Calc.summary(month);
       $('#incomeFoot').innerHTML = rows.length ? totals([
@@ -1999,30 +2000,30 @@
 
       $('#categoryList').innerHTML = rows.length
         ? '<div class="rows">' + rows.map((c) =>
-            '<div class="row">' +
-              '<div class="row__main">' +
-                '<span class="row__title">' + esc(c.name) + ' ' + statusPill(c.status, c.pct) + '</span>' +
-                '<span class="row__sub">' + esc(t('cat.txCount', { n: c.txCount })) +
-                  (c.note ? ' · ' + esc(c.note) : '') + '</span>' +
-              '</div>' +
-              '<div class="row__amounts">' +
-                '<span class="row__amount num">' + Money.format(c.actual) + '</span>' +
-                '<span class="row__sub num">' +
-                  esc(t('common.of', { amount: Money.format(c.planned) })) + '</span>' +
-              '</div>' +
-              (c.isOrphan ? '' : rowActions('category', c.id)) +
-              '<div class="row__progress">' + progressBar(c.pct, c.status) +
-                '<p class="row__sub ' + (c.balance < 0 ? 'neg' : 'muted') + '" style="margin-top:4px">' +
-                  esc(c.balance < 0
-                    ? t('cat.overBudget', { amount: Money.format(Math.abs(c.balance)) })
-                    : t('cat.leftToSpend', { amount: Money.format(c.balance) })) + '</p>' +
-              '</div>' +
-            '</div>').join('') + '</div>'
+          '<div class="row">' +
+          '<div class="row__main">' +
+          '<span class="row__title">' + esc(c.name) + ' ' + statusPill(c.status, c.pct) + '</span>' +
+          '<span class="row__sub">' + esc(t('cat.txCount', { n: c.txCount })) +
+          (c.note ? ' · ' + esc(c.note) : '') + '</span>' +
+          '</div>' +
+          '<div class="row__amounts">' +
+          '<span class="row__amount num">' + Money.format(c.actual) + '</span>' +
+          '<span class="row__sub num">' +
+          esc(t('common.of', { amount: Money.format(c.planned) })) + '</span>' +
+          '</div>' +
+          (c.isOrphan ? '' : rowActions('category', c.id)) +
+          '<div class="row__progress">' + progressBar(c.pct, c.status) +
+          '<p class="row__sub ' + (c.balance < 0 ? 'neg' : 'muted') + '" style="margin-top:4px">' +
+          esc(c.balance < 0
+            ? t('cat.overBudget', { amount: Money.format(Math.abs(c.balance)) })
+            : t('cat.leftToSpend', { amount: Money.format(c.balance) })) + '</p>' +
+          '</div>' +
+          '</div>').join('') + '</div>'
         : emptyState('🗂️', t('empty.noCats.title'), t('empty.noCats.text'),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="category">' +
-              esc(t('empty.noCats.btn')) + '</button>' +
-            '<button type="button" class="btn btn--sm" data-menu-action="seed-defaults">' +
-              esc(t('budget.useStarter')) + '</button>' + copyPlanButton(monthKey));
+          '<button type="button" class="btn btn--primary btn--sm" data-add="category">' +
+          esc(t('empty.noCats.btn')) + '</button>' +
+          '<button type="button" class="btn btn--sm" data-menu-action="seed-defaults">' +
+          esc(t('budget.useStarter')) + '</button>' + copyPlanButton(monthKey));
 
       const s = Calc.summary(month);
       $('#categoryFoot').innerHTML = rows.length ? totals([
@@ -2039,34 +2040,34 @@
 
       $('#allocationList').innerHTML = rows.length
         ? '<div class="rows">' + rows.map((a) =>
-            '<div class="row">' +
-              '<div class="row__main">' +
-                '<span class="row__title">' + esc(a.name) +
-                  (a.planned > 0 && a.actual >= a.planned
-                    ? '<span class="pill pill--ok">' + esc(t('alloc.funded')) + '</span>'
-                    : '<span class="pill pill--info">' + Math.round(a.pct) + '%</span>') +
-                '</span>' +
-                '<span class="row__sub">' +
-                  esc(a.remaining > 0
-                    ? t('alloc.stillToSet', { amount: Money.format(a.remaining) })
-                    : t('alloc.targetMet')) +
-                  (a.logged > 0 ? ' · ' + esc(t('alloc.includesLogged', { amount: Money.format(a.logged) })) : '') +
-                  (a.note ? ' · ' + esc(a.note) : '') +
-                '</span>' +
-              '</div>' +
-              '<div class="row__amounts">' +
-                '<span class="row__amount num">' + Money.format(a.actual) + '</span>' +
-                '<span class="row__sub num">' +
-                  esc(t('common.of', { amount: Money.format(a.planned) })) + '</span>' +
-              '</div>' +
-              rowActions('allocation', a.id) +
-              '<div class="row__progress">' + progressBar(a.pct, a.pct >= 100 ? 'ok' : 'info') + '</div>' +
-            '</div>').join('') + '</div>'
+          '<div class="row">' +
+          '<div class="row__main">' +
+          '<span class="row__title">' + esc(a.name) +
+          (a.planned > 0 && a.actual >= a.planned
+            ? '<span class="pill pill--ok">' + esc(t('alloc.funded')) + '</span>'
+            : '<span class="pill pill--info">' + Math.round(a.pct) + '%</span>') +
+          '</span>' +
+          '<span class="row__sub">' +
+          esc(a.remaining > 0
+            ? t('alloc.stillToSet', { amount: Money.format(a.remaining) })
+            : t('alloc.targetMet')) +
+          (a.logged > 0 ? ' · ' + esc(t('alloc.includesLogged', { amount: Money.format(a.logged) })) : '') +
+          (a.note ? ' · ' + esc(a.note) : '') +
+          '</span>' +
+          '</div>' +
+          '<div class="row__amounts">' +
+          '<span class="row__amount num">' + Money.format(a.actual) + '</span>' +
+          '<span class="row__sub num">' +
+          esc(t('common.of', { amount: Money.format(a.planned) })) + '</span>' +
+          '</div>' +
+          rowActions('allocation', a.id) +
+          '<div class="row__progress">' + progressBar(a.pct, a.pct >= 100 ? 'ok' : 'info') + '</div>' +
+          '</div>').join('') + '</div>'
         : emptyState('🏦', t('empty.noAllocs.title'), t('empty.noAllocsLong.text'),
-            '<button type="button" class="btn btn--primary btn--sm" data-add="allocation">' +
-              esc(t('empty.addAllocation')) + '</button>' +
-            '<button type="button" class="btn btn--sm" data-menu-action="seed-defaults">' +
-              esc(t('budget.useStarter')) + '</button>' + copyPlanButton(monthKey));
+          '<button type="button" class="btn btn--primary btn--sm" data-add="allocation">' +
+          esc(t('empty.addAllocation')) + '</button>' +
+          '<button type="button" class="btn btn--sm" data-menu-action="seed-defaults">' +
+          esc(t('budget.useStarter')) + '</button>' + copyPlanButton(monthKey));
 
       const s = Calc.summary(month);
       $('#allocationFoot').innerHTML = rows.length ? totals([
@@ -2104,31 +2105,31 @@
 
       $('#transactionList').innerHTML = rows.length
         ? '<table class="tx-table"><caption class="sr-only">' + esc(t('tx.caption', { month: label })) + '</caption>' +
-          '<thead><tr><th scope="col">' + esc(t('form.field.description')) + '</th>' +
-          '<th scope="col">' + esc(t('form.field.amount')) + '</th>' +
-          '<th scope="col">' + esc(t('form.field.type')) + '</th></tr></thead>' +
-          '<tbody>' + rows.map((tx) =>
-            '<tr>' +
-              '<td class="tx-desc">' + esc(tx.description) + '</td>' +
-              '<td class="tx-amount num ' + (tx.type === 'income' ? 'pos' : (tx.type === 'expense' ? 'neg' : '')) + '">' +
-                (tx.type === 'income' ? '+' : '−') + Money.format(tx.amount) + '</td>' +
-              '<td class="tx-meta">' + typePill[tx.type] +
-                '<span>' + esc(Utils.shortDate(tx.date)) + '</span>' +
-                '<span>' + esc(tx.refName || t('tx.unassigned')) + '</span></td>' +
-              '<td class="tx-actions">' +
-                '<button type="button" class="btn btn--ghost btn--sm" data-edit="transaction" data-id="' + esc(tx.id) + '">' +
-                  esc(t('action.edit')) + '</button>' +
-                '<button type="button" class="icon-btn icon-btn--danger" data-delete="transaction" data-id="' + esc(tx.id) + '" ' +
-                'aria-label="' + esc(t('tx.deleteAria')) + '"><span aria-hidden="true">🗑</span></button>' +
-              '</td>' +
-            '</tr>').join('') + '</tbody></table>'
+        '<thead><tr><th scope="col">' + esc(t('form.field.description')) + '</th>' +
+        '<th scope="col">' + esc(t('form.field.amount')) + '</th>' +
+        '<th scope="col">' + esc(t('form.field.type')) + '</th></tr></thead>' +
+        '<tbody>' + rows.map((tx) =>
+          '<tr>' +
+          '<td class="tx-desc">' + esc(tx.description) + '</td>' +
+          '<td class="tx-amount num ' + (tx.type === 'income' ? 'pos' : (tx.type === 'expense' ? 'neg' : '')) + '">' +
+          (tx.type === 'income' ? '+' : '−') + Money.format(tx.amount) + '</td>' +
+          '<td class="tx-meta">' + typePill[tx.type] +
+          '<span>' + esc(Utils.shortDate(tx.date)) + '</span>' +
+          '<span>' + esc(tx.refName || t('tx.unassigned')) + '</span></td>' +
+          '<td class="tx-actions">' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-edit="transaction" data-id="' + esc(tx.id) + '">' +
+          esc(t('action.edit')) + '</button>' +
+          '<button type="button" class="icon-btn icon-btn--danger" data-delete="transaction" data-id="' + esc(tx.id) + '" ' +
+          'aria-label="' + esc(t('tx.deleteAria')) + '"><span aria-hidden="true">🗑</span></button>' +
+          '</td>' +
+          '</tr>').join('') + '</tbody></table>'
         : (all.length
-            ? emptyState('🔍', t('empty.noMatches.title'), t('empty.noMatches.text'),
-                '<button type="button" class="btn btn--sm" id="btnClearFilters2">' +
-                  esc(t('empty.noMatches.btn')) + '</button>')
-            : emptyState('🧾', t('empty.noTx.title'), t('empty.noTx.text', { month: label }),
-                '<button type="button" class="btn btn--primary btn--sm" data-add="transaction">' +
-                  esc(t('empty.addTransaction')) + '</button>'));
+          ? emptyState('🔍', t('empty.noMatches.title'), t('empty.noMatches.text'),
+            '<button type="button" class="btn btn--sm" id="btnClearFilters2">' +
+            esc(t('empty.noMatches.btn')) + '</button>')
+          : emptyState('🧾', t('empty.noTx.title'), t('empty.noTx.text', { month: label }),
+            '<button type="button" class="btn btn--primary btn--sm" data-add="transaction">' +
+            esc(t('empty.addTransaction')) + '</button>'));
 
       const shown = rows.reduce((acc, tx) => {
         acc[tx.type] = round2((acc[tx.type] || 0) + tx.amount);
@@ -2281,17 +2282,25 @@
         columns: 2,
         submitLabel: t(existing ? 'action.saveChanges' : 'form.income.submitAdd'),
         fields: [
-          { name: 'name', label: t('form.field.sourceName'), type: 'text', required: true, full: true,
+          {
+            name: 'name', label: t('form.field.sourceName'), type: 'text', required: true, full: true,
             value: existing ? existing.name : '', placeholder: t('form.ph.sourceName'),
-            hint: t('form.hint.sourceName') },
-          { name: 'planned', label: t('form.field.plannedAmount'), type: 'money', required: true, min: 0,
+            hint: t('form.hint.sourceName')
+          },
+          {
+            name: 'planned', label: t('form.field.plannedAmount'), type: 'money', required: true, min: 0,
             value: existing ? existing.planned : '', placeholder: '0.00',
-            hint: t('form.hint.plannedAmount') },
-          { name: 'actual', label: t('form.field.actualReceived'), type: 'money', required: true, min: 0,
+            hint: t('form.hint.plannedAmount')
+          },
+          {
+            name: 'actual', label: t('form.field.actualReceived'), type: 'money', required: true, min: 0,
             value: existing ? existing.actual : 0, placeholder: '0.00',
-            hint: t('form.hint.actualReceived') },
-          { name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
-            value: existing ? existing.note : '' }
+            hint: t('form.hint.actualReceived')
+          },
+          {
+            name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
+            value: existing ? existing.note : ''
+          }
         ],
         onSubmit: (v) => {
           const data = { name: v.name, planned: v.planned, actual: v.actual, note: v.note };
@@ -2317,18 +2326,24 @@
         submitLabel: t(existing ? 'action.saveChanges' : 'form.category.submitAdd'),
         intro: spent ? t('form.intro.spent', { amount: Money.format(spent.actual), n: spent.txCount }) : null,
         fields: [
-          { name: 'name', label: t('form.field.categoryName'), type: 'text', required: true, full: true,
+          {
+            name: 'name', label: t('form.field.categoryName'), type: 'text', required: true, full: true,
             value: existing ? existing.name : '', placeholder: t('form.ph.categoryName'),
             validate: (value) => {
               const clash = Model.getMonth(currentMonth).categories
                 .some((c) => c.id !== id && c.name.toLowerCase() === String(value).toLowerCase());
               return clash ? t('form.err.duplicateCategory') : null;
-            } },
-          { name: 'planned', label: t('form.field.monthlyBudget'), type: 'money', required: true, min: 0,
+            }
+          },
+          {
+            name: 'planned', label: t('form.field.monthlyBudget'), type: 'money', required: true, min: 0,
             value: existing ? existing.planned : '', placeholder: '0.00',
-            hint: t('form.hint.monthlyBudget') },
-          { name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
-            value: existing ? existing.note : '' }
+            hint: t('form.hint.monthlyBudget')
+          },
+          {
+            name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
+            value: existing ? existing.note : ''
+          }
         ],
         onSubmit: (v) => {
           const data = { name: v.name, planned: v.planned, note: v.note };
@@ -2349,15 +2364,23 @@
         columns: 2,
         submitLabel: t(existing ? 'action.saveChanges' : 'form.allocation.submitAdd'),
         fields: [
-          { name: 'name', label: t('form.field.allocName'), type: 'text', required: true, full: true,
-            value: existing ? existing.name : '', placeholder: t('form.ph.allocName') },
-          { name: 'planned', label: t('form.field.targetMonth'), type: 'money', required: true, min: 0,
-            value: existing ? existing.planned : '', placeholder: '0.00' },
-          { name: 'actual', label: t('form.field.setAside'), type: 'money', required: true, min: 0,
+          {
+            name: 'name', label: t('form.field.allocName'), type: 'text', required: true, full: true,
+            value: existing ? existing.name : '', placeholder: t('form.ph.allocName')
+          },
+          {
+            name: 'planned', label: t('form.field.targetMonth'), type: 'money', required: true, min: 0,
+            value: existing ? existing.planned : '', placeholder: '0.00'
+          },
+          {
+            name: 'actual', label: t('form.field.setAside'), type: 'money', required: true, min: 0,
             value: existing ? existing.actual : 0, placeholder: '0.00',
-            hint: t('form.hint.setAside') },
-          { name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
-            value: existing ? existing.note : '' }
+            hint: t('form.hint.setAside')
+          },
+          {
+            name: 'note', label: t('form.field.note'), type: 'textarea', full: true,
+            value: existing ? existing.note : ''
+          }
         ],
         onSubmit: (v) => {
           const data = { name: v.name, planned: v.planned, actual: v.actual, note: v.note };
@@ -2404,25 +2427,35 @@
         columns: 2,
         submitLabel: t(existing ? 'action.saveChanges' : 'form.tx.submitAdd'),
         fields: [
-          { name: 'description', label: t('form.field.description'), type: 'text', required: true, full: true,
-            value: existing ? existing.description : '', placeholder: t('form.ph.description') },
-          { name: 'type', label: t('form.field.type'), type: 'select', required: true, value: initialType,
+          {
+            name: 'description', label: t('form.field.description'), type: 'text', required: true, full: true,
+            value: existing ? existing.description : '', placeholder: t('form.ph.description')
+          },
+          {
+            name: 'type', label: t('form.field.type'), type: 'select', required: true, value: initialType,
             options: [
               { value: 'expense', label: t('tx.typeExpense') },
               { value: 'income', label: t('tx.typeIncome') },
               { value: 'allocation', label: t('tx.typeAllocation') }
-            ] },
-          { name: 'amount', label: t('form.field.amount'), type: 'money', required: true, min: 0.01,
-            value: existing ? existing.amount : '', placeholder: '0.00' },
-          { name: 'refId', label: t(REF_LABEL_KEY[initialType]), type: 'select',
+            ]
+          },
+          {
+            name: 'amount', label: t('form.field.amount'), type: 'money', required: true, min: 0.01,
+            value: existing ? existing.amount : '', placeholder: '0.00'
+          },
+          {
+            name: 'refId', label: t(REF_LABEL_KEY[initialType]), type: 'select',
             value: existing ? (existing.refId || '') : '', options: refOptions(initialType),
-            hint: t(REF_HINT_KEY[initialType]) },
-          { name: 'date', label: t('form.field.date'), type: 'date', required: true, value: defaultDate,
+            hint: t(REF_HINT_KEY[initialType])
+          },
+          {
+            name: 'date', label: t('form.field.date'), type: 'date', required: true, value: defaultDate,
             min: Utils.monthStart(currentMonth), max: Utils.monthEnd(currentMonth),
             hint: t('form.hint.date', { month: label }),
             validate: (value) => (value >= Utils.monthStart(currentMonth) && value <= Utils.monthEnd(currentMonth))
               ? null
-              : t('valid.dateRange', { month: label }) }
+              : t('valid.dateRange', { month: label })
+          }
         ],
         onChange: function (changedName, values, api) {
           if (changedName !== 'type' && changedName !== '__init__') return;
@@ -2556,15 +2589,19 @@
         submitLabel: t('settings.submit'),
         intro: t('settings.intro'),
         fields: [
-          { name: 'currency', label: t('settings.currency'), type: 'select', required: true,
+          {
+            name: 'currency', label: t('settings.currency'), type: 'select', required: true,
             value: settings.currency, hint: t('settings.currencyHint'),
-            options: CURRENCIES.map((c) => ({ value: c, label: c })) },
-          { name: 'language', label: t('settings.language'), type: 'select', required: true,
+            options: CURRENCIES.map((c) => ({ value: c, label: c }))
+          },
+          {
+            name: 'language', label: t('settings.language'), type: 'select', required: true,
             value: I18n.language(), hint: t('settings.languageHint'),
             options: [
               { value: 'es', label: t('settings.langEs') },
               { value: 'en', label: t('settings.langEn') }
-            ] }
+            ]
+          }
         ],
         onSubmit: (v) => {
           const res1 = Model.setSetting('currency', v.currency);
