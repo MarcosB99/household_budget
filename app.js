@@ -112,6 +112,25 @@
       'tile.fullyFunded': 'Fully funded',
       'tile.overcommitted': 'Overcommitted',
       'tile.available': 'Available',
+      'tile.includesCarry': 'incl. {amount} carried over',
+
+      /* --- carry-over / accumulator --- */
+      'carry.title': 'Carried over',
+      'carry.from': 'from {month}',
+      'carry.firstMonth': 'This is your first month — set an opening balance if you already have money in the account.',
+      'carry.auto': 'Automatic',
+      'carry.manual': 'Manual',
+      'carry.autoHint': 'Recalculates if {month} changes.',
+      'carry.manualHint': 'Set by hand. Computed figure: {amount}.',
+      'carry.setBtn': 'Set manually',
+      'carry.resetBtn': 'Use computed',
+      'carry.carriesInto': 'Carries into {month}',
+      'form.carry.title': 'Opening balance for {month}',
+      'form.field.openingBalance': 'Opening balance',
+      'form.hint.openingBalanceAuto': 'Computed from {month}: {amount}. Type the real account balance to pin it instead.',
+      'form.hint.openingBalanceFirst': 'What was already in the account when {month} started.',
+      'toast.carrySet': 'Opening balance set.',
+      'toast.carryReset': 'Opening balance back to automatic.',
 
       'compare.income': 'Income',
       'compare.expenses': 'Expenses',
@@ -438,6 +457,25 @@
       'tile.fullyFunded': 'Meta completa',
       'tile.overcommitted': 'Sobrecomprometido',
       'tile.available': 'Disponible',
+      'tile.includesCarry': 'incl. {amount} acumulado',
+
+      /* --- carry-over / accumulator --- */
+      'carry.title': 'Viene del mes anterior',
+      'carry.from': 'de {month}',
+      'carry.firstMonth': 'Este es tu primer mes — poné un saldo inicial si ya tenés dinero en la cuenta.',
+      'carry.auto': 'Automático',
+      'carry.manual': 'Manual',
+      'carry.autoHint': 'Se recalcula si {month} cambia.',
+      'carry.manualHint': 'Ajustado a mano. Cifra calculada: {amount}.',
+      'carry.setBtn': 'Ajustar a mano',
+      'carry.resetBtn': 'Usar calculado',
+      'carry.carriesInto': 'Pasa a {month}',
+      'form.carry.title': 'Saldo inicial de {month}',
+      'form.field.openingBalance': 'Saldo inicial',
+      'form.hint.openingBalanceAuto': 'Calculado desde {month}: {amount}. Escribí el saldo real de la cuenta para fijarlo.',
+      'form.hint.openingBalanceFirst': 'Lo que ya había en la cuenta cuando empezó {month}.',
+      'toast.carrySet': 'Saldo inicial fijado.',
+      'toast.carryReset': 'El saldo inicial volvió a ser automático.',
 
       'compare.income': 'Ingresos',
       'compare.expenses': 'Gastos',
@@ -951,7 +989,7 @@
    * 4. MODEL — shape, defaults, migration, CRUD
    * =========================================================== */
   const Model = (() => {
-    const SCHEMA = 2;
+    const SCHEMA = 3;
     const DEFAULT_CURRENCY = 'GTQ';
 
     /* Seeds are translation KEYS: the name is resolved at seed time and
@@ -969,8 +1007,13 @@
 
     let state = null;
 
+    /**
+     * carryOverride: null  → the opening balance is derived from the running
+     *                        balance of every earlier month (and keeps updating).
+     *                a number → the user pinned it by hand; the chain restarts here.
+     */
     function emptyMonth() {
-      return { income: [], categories: [], allocations: [], transactions: [] };
+      return { income: [], categories: [], allocations: [], transactions: [], carryOverride: null };
     }
 
     function blankState() {
@@ -1049,6 +1092,11 @@
           createdAt: typeof item.createdAt === 'string' ? item.createdAt : new Date().toISOString()
         }));
 
+        /* Absent on schema < 3; absence simply means "derive it". */
+        month.carryOverride = (src.carryOverride == null || src.carryOverride === '')
+          ? null
+          : safeSignedMoney(src.carryOverride);
+
         base.months[key] = month;
       });
 
@@ -1066,6 +1114,12 @@
       const n = parseAmount(v);
       if (!isFinite(n) || n < 0) return 0;
       return Math.min(n, 1e12);
+    }
+    /** Like safeMoney but keeps the sign — an account can be overdrawn. */
+    function safeSignedMoney(v) {
+      const n = parseAmount(v);
+      if (!isFinite(n)) return 0;
+      return Math.max(-1e12, Math.min(n, 1e12));
     }
 
     /* ---------- lifecycle ---------- */
@@ -1167,6 +1221,14 @@
       return persist();
     }
 
+    /** Pin this month's opening balance, or pass null to go back to automatic. */
+    function setCarryOverride(key, value) {
+      const month = getMonth(key);
+      month.carryOverride = (value == null) ? null : safeSignedMoney(value);
+      const res = persist();
+      return res.ok ? { ok: true } : res;
+    }
+
     /* ---------- generic entity CRUD ---------- */
 
     function collectionOf(monthKey, kind) {
@@ -1232,7 +1294,7 @@
       SCHEMA, DEFAULT_CURRENCY, TX_TYPES, REF_COLLECTION,
       load, persist, getState, replaceState, mergeState, resetAll, normalise,
       hasMonth, getMonth, peekMonth, monthKeys, isMonthEmpty, seedDefaults,
-      copyPlan, clearMonth,
+      copyPlan, clearMonth, setCarryOverride,
       findEntity, addEntity, updateEntity, removeEntity, countLinkedTransactions,
       setSetting
     };
@@ -1368,6 +1430,46 @@
       };
     }
 
+    /**
+     * The running balance ("accumulator") for one month.
+     *
+     * Walks every stored month in date order, carrying the leftover forward:
+     *
+     *     carryOut = carryIn + income − expenses − allocations
+     *     carryIn  = the previous month's carryOut, unless pinned by hand
+     *
+     * Allocations are treated as money that has left the spending account,
+     * so they reduce what carries forward. A manual override restarts the
+     * chain at that month, which is what makes it a reconciliation point.
+     *
+     * Returns { carryIn, computedIn, carryOut, isManual }. `computedIn` is
+     * what the chain would have produced, so the UI can offer to revert.
+     */
+    function carryFor(targetKey) {
+      const earlier = Model.monthKeys().filter((key) => key <= targetKey);
+      let running = 0;
+      let result = null;
+
+      earlier.forEach((key) => {
+        const month = Model.peekMonth(key);
+        if (!month) return;
+
+        const computedIn = running;
+        const override = month.carryOverride;
+        const isManual = typeof override === 'number' && isFinite(override);
+        const carryIn = isManual ? override : computedIn;
+
+        const s = summary(month);
+        const carryOut = round2(carryIn + s.income.actual - s.expenses.actual - s.allocations.actual);
+        running = carryOut;
+
+        if (key === targetKey) result = { carryIn, computedIn, carryOut, isManual };
+      });
+
+      // A month with no stored data yet simply inherits the running balance.
+      return result || { carryIn: running, computedIn: running, carryOut: running, isManual: false };
+    }
+
     /** Transactions sorted newest first, with their reference name resolved. */
     function transactionRows(month) {
       const nameFor = (tx) => {
@@ -1384,7 +1486,7 @@
         .map((tx) => Object.assign({}, tx, { refName: nameFor(tx) }));
     }
 
-    return { summary, incomeRows, categoryRows, allocationRows, transactionRows, statusFor, txOf };
+    return { summary, carryFor, incomeRows, categoryRows, allocationRows, transactionRows, statusFor, txOf };
   })();
 
   /* ===========================================================
@@ -1830,6 +1932,14 @@
     function dashboard(month, monthKey) {
       const s = Calc.summary(month);
       const label = Utils.monthLabel(monthKey);
+      const carry = Calc.carryFor(monthKey);
+
+      /* Opening balance carried in from earlier months */
+      $('#carryCard').innerHTML = carryCard(monthKey, carry);
+
+      /* What is actually spendable = what carried in, plus this month's net */
+      const availableActual = carry.carryOut;
+      const availablePlanned = round2(carry.carryIn + s.remaining.planned);
 
       /* Summary tiles */
       $('#summaryGrid').innerHTML = [
@@ -1846,10 +1956,12 @@
           s.allocations.planned - s.allocations.actual > 0
             ? t('tile.toGo', { amount: Money.format(s.allocations.planned - s.allocations.actual) })
             : t('tile.fullyFunded')),
-        tile('remaining', t('tile.unallocated'), s.remaining.actual,
-          t('tile.planned', { amount: Money.format(s.remaining.planned) }),
-          s.remaining.actual < 0 ? t('tile.overcommitted') : t('tile.available'),
-          s.remaining.actual < 0 ? 'neg' : 'pos')
+        tile('remaining', t('tile.unallocated'), availableActual,
+          t('tile.planned', { amount: Money.format(availablePlanned) }),
+          carry.carryIn !== 0
+            ? t('tile.includesCarry', { amount: Money.format(carry.carryIn) })
+            : (availableActual < 0 ? t('tile.overcommitted') : t('tile.available')),
+          availableActual < 0 ? 'neg' : 'pos')
       ].join('');
 
       /* Planned vs actual */
@@ -1933,6 +2045,57 @@
         '<p class="tile__value num ' + (tone || '') + '">' + Money.format(value) + '</p>' +
         '<p class="tile__meta"><span>' + esc(metaA) + '</span><span>·</span><span>' + esc(metaB) + '</span></p>' +
         '</article>';
+    }
+
+    /**
+     * The accumulator strip: what came in from earlier months, and what this
+     * month will hand to the next one.
+     */
+    function carryCard(monthKey, carry) {
+      const prevLabel = Utils.monthLabel(Utils.shiftMonth(monthKey, -1));
+      const nextLabel = Utils.monthLabel(Utils.shiftMonth(monthKey, 1));
+      const hasHistory = Model.monthKeys().some((key) => key < monthKey);
+
+      const pill = carry.isManual
+        ? '<span class="pill pill--info">' + esc(t('carry.manual')) + '</span>'
+        : '<span class="pill pill--brand">' + esc(t('carry.auto')) + '</span>';
+
+      let hint;
+      if (carry.isManual) {
+        hint = t('carry.manualHint', { amount: Money.format(carry.computedIn) });
+      } else if (hasHistory) {
+        hint = t('carry.autoHint', { month: prevLabel });
+      } else {
+        hint = t('carry.firstMonth');
+      }
+
+      return '<section class="carry" aria-label="' + esc(t('carry.title')) + '">' +
+
+        '<div class="carry__part">' +
+        '<p class="carry__label">' + esc(t('carry.title')) +
+        (hasHistory ? ' <span class="carry__from">' + esc(t('carry.from', { month: prevLabel })) + '</span>' : '') +
+        ' ' + pill + '</p>' +
+        '<p class="carry__value num ' + (carry.carryIn < 0 ? 'neg' : '') + '">' +
+        Money.format(carry.carryIn) + '</p>' +
+        '<p class="carry__hint">' + esc(hint) + '</p>' +
+        '</div>' +
+
+        '<div class="carry__actions">' +
+        '<button type="button" class="btn btn--sm" data-carry="edit">' +
+        esc(carry.isManual ? t('action.edit') : t('carry.setBtn')) + '</button>' +
+        (carry.isManual
+          ? '<button type="button" class="btn btn--ghost btn--sm" data-carry="reset">' +
+          esc(t('carry.resetBtn')) + '</button>'
+          : '') +
+        '</div>' +
+
+        '<div class="carry__part carry__part--out">' +
+        '<p class="carry__label">' + esc(t('carry.carriesInto', { month: nextLabel })) + '</p>' +
+        '<p class="carry__value num ' + (carry.carryOut < 0 ? 'neg' : 'pos') + '">' +
+        Money.format(carry.carryOut) + '</p>' +
+        '</div>' +
+
+        '</section>';
     }
 
     function compareRow(name, actual, planned, tone) {
@@ -2482,6 +2645,45 @@
       });
     }
 
+    /* ---------------- carry-over (accumulator) ---------------- */
+
+    function openCarryForm() {
+      const carry = Calc.carryFor(currentMonth);
+      const label = Utils.monthLabel(currentMonth);
+      const prevLabel = Utils.monthLabel(Utils.shiftMonth(currentMonth, -1));
+      const hasHistory = Model.monthKeys().some((key) => key < currentMonth);
+
+      Form.open({
+        title: t('form.carry.title', { month: label }),
+        submitLabel: t('action.save'),
+        fields: [{
+          name: 'opening', label: t('form.field.openingBalance'), type: 'money',
+          required: true, full: true,
+          min: -1e12, // an account can legitimately be overdrawn
+          value: carry.carryIn,
+          placeholder: '0.00',
+          hint: hasHistory
+            ? t('form.hint.openingBalanceAuto', {
+              month: prevLabel, amount: Money.format(carry.computedIn)
+            })
+            : t('form.hint.openingBalanceFirst', { month: label })
+        }],
+        onSubmit: (v) => {
+          const res = Model.setCarryOverride(currentMonth, v.opening);
+          if (!res.ok) return res;
+          renderAll();
+          Toast.ok(t('toast.carrySet'));
+        }
+      });
+    }
+
+    function resetCarry() {
+      const res = Model.setCarryOverride(currentMonth, null);
+      if (!res.ok) { Toast.error(res.error); return; }
+      renderAll();
+      Toast.ok(t('toast.carryReset'));
+    }
+
     /* ---------------- delete flows ---------------- */
 
     async function handleDelete(kind, id) {
@@ -2759,6 +2961,13 @@
 
         const delBtn = e.target.closest('[data-delete]');
         if (delBtn) { handleDelete(delBtn.dataset.delete, delBtn.dataset.id); return; }
+
+        const carryBtn = e.target.closest('[data-carry]');
+        if (carryBtn) {
+          if (carryBtn.dataset.carry === 'reset') resetCarry();
+          else openCarryForm();
+          return;
+        }
 
         const gotoBtn = e.target.closest('[data-goto]');
         if (gotoBtn) { setView(gotoBtn.dataset.goto); return; }

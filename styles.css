@@ -606,6 +606,57 @@ button, input, select, textarea { font: inherit; color: inherit; }
   gap: var(--sp-1) var(--sp-2);
 }
 
+/* Carry-over strip (the accumulator): opening balance in, closing balance out */
+.carry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-left: 4px solid var(--c-brand);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+}
+
+.carry__part { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.carry__label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 700;
+  color: var(--c-text-faint);
+}
+.carry__from { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+.carry__value {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  overflow-wrap: anywhere;
+}
+
+.carry__hint { font-size: var(--fs-xs); color: var(--c-text-muted); }
+
+.carry__actions {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* The closing figure is separated by a rule that flips with the layout */
+.carry__part--out {
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--c-border);
+}
+
 /* Progress bars */
 .progress {
   position: relative;
@@ -1012,6 +1063,23 @@ button, input, select, textarea { font: inherit; color: inherit; }
     align-items: center;
   }
   .tx-table .tx-amount { grid-column: 2; }
+
+  /* Carry strip becomes one row: in · actions · out */
+  .carry {
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
+  }
+  .carry__part--out {
+    padding-top: 0;
+    padding-left: var(--sp-4);
+    border-top: 0;
+    border-left: 1px dashed var(--c-border);
+    text-align: right;
+    align-items: flex-end;
+  }
+  .carry__part--out .carry__value { font-size: var(--fs-lg); }
 
   .modal { align-items: center; padding: var(--sp-4); }
   .modal__panel { border-radius: var(--r-lg); }
