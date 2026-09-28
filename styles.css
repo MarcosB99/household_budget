@@ -593,10 +593,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
   color: var(--c-text-faint);
 }
 .tile__value {
-  font-size: var(--fs-xl);
+  /* Two tiles share a phone's width, so a five-figure amount has to shrink
+     rather than wrap — breaking "Q 18,500.00" mid-number is unreadable.
+     The >=600px rule below takes over before the cap is ever reached. */
+  font-size: clamp(1rem, 4.4vw, var(--fs-xl));
   font-weight: 700;
   letter-spacing: -.02em;
-  overflow-wrap: anywhere;
+  /* Last resort only: break-word keeps normal amounts intact and steps in
+     for absurd values, so the tile can never force a horizontal scroll. */
+  overflow-wrap: break-word;
 }
 .tile__meta {
   font-size: var(--fs-xs);
@@ -636,10 +641,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .carry__from { text-transform: none; letter-spacing: 0; font-weight: 600; }
 
 .carry__value {
-  font-size: var(--fs-xl);
+  /* Full-width so it has more room than a tile, but same rule: never split
+     a number across lines. */
+  font-size: clamp(1.15rem, 5vw, var(--fs-xl));
   font-weight: 700;
   letter-spacing: -.02em;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .carry__hint { font-size: var(--fs-xs); color: var(--c-text-muted); }
