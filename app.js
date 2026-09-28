@@ -139,6 +139,7 @@
       'common.of': 'of {amount}',
 
       'status.over': 'Over · {pct}%',
+      'status.full': 'Fully spent',
       'status.close': 'Close · {pct}%',
       'status.onTrack': 'On track · {pct}%',
       'status.noBudget': 'No budget set',
@@ -484,6 +485,7 @@
       'common.of': 'de {amount}',
 
       'status.over': 'Excedido · {pct}%',
+      'status.full': 'Agotado',
       'status.close': 'Cerca · {pct}%',
       'status.onTrack': 'En orden · {pct}%',
       'status.noBudget': 'Sin presupuesto',
@@ -1391,10 +1393,13 @@
     /** Traffic-light status for a spending category. */
     function statusFor(planned, actual) {
       if (planned <= 0) return actual > 0 ? 'over' : 'none';
-      const pct = (actual / planned) * 100;
-      if (pct > 100) return 'over';
-      if (pct >= 85) return 'warn';
-      return 'ok';
+      /* Compare in cents rather than percent: spending exactly the budget is
+         its own state ("used up"), not "close to" anything, and a float
+         percentage would put it on the wrong side of the boundary. */
+      const diff = round2(actual - planned);
+      if (diff > 0) return 'over';
+      if (diff === 0) return 'full';
+      return ((actual / planned) * 100) >= 85 ? 'warn' : 'ok';
     }
 
     /** The headline figures for a month. */
@@ -1891,7 +1896,12 @@
    * =========================================================== */
   const Render = (() => {
 
-    const TONE_CLASS = { ok: 'ok', warn: 'warn', over: 'over', none: 'none', info: 'info', partial: 'info' };
+    /* 'full' shares the amber of 'warn': the budget is not blown, but there
+       is nothing left in it either. */
+    const TONE_CLASS = {
+      ok: 'ok', warn: 'warn', full: 'warn', over: 'over',
+      none: 'none', info: 'info', partial: 'info'
+    };
 
     function progressBar(pct, tone) {
       const width = Utils.clamp(isFinite(pct) ? pct : 0, 0, 100);
@@ -1910,12 +1920,26 @@
         '</div>';
     }
 
+    /**
+     * The number must never contradict the word, so rounding is directional:
+     * under budget floors (99.6% reads "99%", not a misleading "100%") and
+     * over budget ceils. Only an exact 100% gets to say so.
+     */
     function statusPill(status, pct) {
-      const rounded = Math.round(isFinite(pct) ? pct : 0);
-      if (status === 'over') return '<span class="pill pill--over">' + esc(t('status.over', { pct: rounded })) + '</span>';
-      if (status === 'warn') return '<span class="pill pill--warn">' + esc(t('status.close', { pct: rounded })) + '</span>';
+      const raw = isFinite(pct) ? pct : 0;
+
       if (status === 'none') return '<span class="pill">' + esc(t('status.noBudget')) + '</span>';
-      return '<span class="pill pill--ok">' + esc(t('status.onTrack', { pct: rounded })) + '</span>';
+      if (status === 'full') return '<span class="pill pill--warn">' + esc(t('status.full')) + '</span>';
+      if (status === 'over') {
+        return '<span class="pill pill--over">' +
+          esc(t('status.over', { pct: Math.ceil(raw) })) + '</span>';
+      }
+
+      const under = Math.min(99, Math.floor(raw));
+      if (status === 'warn') {
+        return '<span class="pill pill--warn">' + esc(t('status.close', { pct: under })) + '</span>';
+      }
+      return '<span class="pill pill--ok">' + esc(t('status.onTrack', { pct: under })) + '</span>';
     }
 
     function rowActions(kind, id) {
