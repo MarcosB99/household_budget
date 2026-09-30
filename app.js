@@ -3055,7 +3055,7 @@
 
       bindEvents();
       setView('dashboard');
-      applyLanguage(I18n.language()); // paints static copy + renders every panel
+      applyLanguage(I18n.language());
 
       if (!Store.isAvailable()) {
         $('#storageNote').textContent = t('app.storageBlocked');
